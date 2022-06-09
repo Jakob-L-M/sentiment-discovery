@@ -46,7 +46,10 @@ def get_model(args):
     sd = None
     model_args = args
     if args.load is not None and args.load != '':
-        sd = torch.load(args.load, map_location= 'gpu' if args.cuda else 'cpu')
+        if args.cuda:
+            sd = torch.load(args.load)
+        else:
+            sd = torch.load(args.load, map_location='cpu')
         if 'args' in sd:
             model_args = sd['args']
         if 'sd' in sd:
