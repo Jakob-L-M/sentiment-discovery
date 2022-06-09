@@ -29,6 +29,8 @@ def get_data_and_args():
 
     args.cuda = torch.cuda.is_available()
     print('Model will run in', 'gpu' if args.cuda else 'cpu', 'mode')
+    if args.cuda:
+        print('found', torch.cuda.device_count(), 'gpus, using gpu', args.gpu_num if args.gpu_num else '0')
     args.shuffle=False
 
     if args.seed is not -1:
@@ -139,6 +141,9 @@ def classify(model, text, args):
     tstart = start = time.time()
     n = 0
     len_ds = len(text)
+    if args.cuda:
+        torch.cuda.set_device(args.gpu_num)
+        print('Starting prediction using', torch.cuda.get_device_name(torch.cuda.current_device()))
     with torch.no_grad():
         for i, data in tqdm(enumerate(text), total=len(text)):
             text_batch, labels_batch, length_batch = get_batch(data)
@@ -227,7 +232,7 @@ def main():
     (train_data, val_data, test_data), tokenizer, args = get_data_and_args()
     print('preparing model')
     model = get_model(args)
-
+    print('classify data')
     ypred, yprob, ystd = classify(model, train_data, args)
 
     save_root = ''

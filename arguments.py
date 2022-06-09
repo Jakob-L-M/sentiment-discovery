@@ -57,6 +57,8 @@ def add_general_args(parser):
                         help='checkpoint gradients to allow for training with larger models and sequences')
     group.add_argument('--multinode-init', action='store_true',
                         help='initialize multinode. Environment variables should be set as according to https://pytorch.org/docs/stable/distributed.html')
+    group.add_argument('--gpu_num', type=int, default=0,
+                        help='specify wich gpu pyTorch should use')
     return parser
 
 def add_unsupervised_data_args(parser):
