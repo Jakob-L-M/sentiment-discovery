@@ -28,6 +28,7 @@ def get_data_and_args():
     args = parser.parse_args()
 
     args.cuda = torch.cuda.is_available()
+    print('Model will run in', 'gpu' if args.cuda else 'cpu', 'mode')
     args.shuffle=False
 
     if args.seed is not -1:
