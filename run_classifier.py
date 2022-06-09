@@ -78,7 +78,7 @@ def get_model(args):
         args.dual_thresh = False
 
     if args.cuda:
-        model.cuda(args.gpu_num)
+        model.cuda('cuda:' + str(args.gpu_num))
 
     if args.fp16:
         model.half()
