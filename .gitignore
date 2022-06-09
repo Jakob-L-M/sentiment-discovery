@@ -103,4 +103,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+## ignoring output files
+*.npy
+
+## ignoreing pretrained models
+*.pt
+*.clf
+
 # End of https://www.gitignore.io/api/python
