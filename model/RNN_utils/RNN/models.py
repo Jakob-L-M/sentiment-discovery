@@ -6,12 +6,12 @@ from .RNNBackend import bidirectionalRNN, stackedRNN, RNNCell
 from .cells import mLSTMRNNCell, mLSTMCell
 
 _VF = torch._C._VariableFunctions
-_rnn_impls = {
-    'LSTM': _VF.lstm_cell,
-    'GRU': _VF.gru_cell,
-    'RNN_TANH': _VF.rnn_tanh_cell,
-    'RNN_RELU': _VF.rnn_relu_cell,
-}
+# _rnn_impls = {
+#     'LSTM': _VF.lstm_cell,
+#     'GRU': _VF.gru_cell,
+#     'RNN_TANH': _VF.rnn_tanh_cell,
+#     'RNN_RELU': _VF.rnn_relu_cell,
+# }
 
 def toRNNBackend(inputRNN, num_layers, bidirectional=False, dropout = 0):
     """
