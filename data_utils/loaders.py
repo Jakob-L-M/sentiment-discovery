@@ -102,6 +102,12 @@ class DataLoader(data.DataLoader):
         self.drop_last = drop_last
         self.timeout = timeout
         self.worker_init_fn = worker_init_fn
+        self.persistent_workers = False
+        self._dataset_kind = data._DatasetKind.Iterable
+        self._iterator = None
+        self.prefetch_factor = 2
+        self.generator = None
+        self.multiprocessing_context = None
         if timeout < 0:
             raise ValueError('timeout option should be non-negative')
 
