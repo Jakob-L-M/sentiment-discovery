@@ -225,6 +225,7 @@ def get_writer(preds, probs, stds, classes, heads_per_class=1, softmax=False, du
 
 def main():
     (train_data, val_data, test_data), tokenizer, args = get_data_and_args()
+    print('preparing model')
     model = get_model(args)
 
     ypred, yprob, ystd = classify(model, train_data, args)
