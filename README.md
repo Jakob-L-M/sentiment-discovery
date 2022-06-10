@@ -1,70 +1,37 @@
-# ** DEPRECATED **
-This repo has been deprecated. Please visit [Megatron-LM](https://github.com/NVIDIA/Megatron-LM) for our up to date Large-scale unsupervised pretraining and finetuning code.
+# Sentiment Discovery
 
-If you would still like to use this codebase, see our tagged releases and install required software/dependencies that was available publicly at that date.
-
+Check out the fork for original readme
 
 # PyTorch Unsupervised Sentiment Discovery
-This codebase contains pretrained binary sentiment and multimodel emotion classification models as well as code to reproduce results from our series of large scale pretraining + transfer NLP papers: _[Large Scale Language Modeling: Converging on 40GB of Text in Four Hours](https://nv-adlr.github.io/publication/2018-large-batch-lm)_ and _[Practical Text Classification With Large Pre-Trained Language Models](https://arxiv.org/abs/1812.01207)_. This effort was born out of a desire to reproduce, analyze, and scale the [Generating Reviews and Discovering Sentiment](https://github.com/openai/generating-reviews-discovering-sentiment) paper from OpenAI.
-
-The techniques used in this repository are general purpose and our easy to use command line interface can be used to train state of the art classification models on your own difficult classification datasets.
-
-This codebase supports mixed precision training as well as distributed, multi-gpu, multi-node training for language models (support is provided based on the NVIDIA [APEx](https://github.com/NVIDIA/apex) project). In addition to training language models, this codebase can be used to easily transfer and finetune trained models on custom text classification datasets.
-
-For example, a [Transformer](https://arxiv.org/abs/1706.03762) language model for unsupervised modeling of large text datasets, such as the [amazon-review dataset](http://jmcauley.ucsd.edu/data/amazon/), is implemented in PyTorch. We also support other tokenization methods, such as character or sentencepiece tokenization, and language models using various recurrent architectures.
-
-The learned language model can be transferred to other natural language processing (NLP) tasks where it is used to featurize text samples. The featurizations provide a strong initialization point for discriminative language tasks, and allow for competitive task performance given only a few labeled samples. For example, we consider finetuning our models on the difficult task of multimodal emotion classification based on a subset of the plutchik wheel of emotions.
+This repo is used to extract the marked sentiment features from the Plutchik wheel
 
 ![plutchik fig](./figures/plutchik-wheel.png "Plutchik Wheel of Emotions")
 
-Created by [Robert Plutchik](https://en.wikipedia.org/wiki/Robert_Plutchik#Plutchik's_wheel_of_emotions), this wheel is used to illustrate different emotions in a compelling and nuanced way. He suggested that there are 8 primary bipolar emotions (joy versus sadness, anger versus fear, trust versus disgust, and surprise versus anticipation) with different levels of emotional intensity. For our classification task we utilize tweets from the [SemEval2018 Task 1E-c emotion classification dataset](https://competitions.codalab.org/competitions/17751) to perform multilabel classification of anger, anticipation, disgust, fear, joy, sadness, surprise, and trust. This is a difficult task that suffers from real world classification problems such as class imbalance and labeler disagreement. 
-
-![semeval results](./figures/semeval_results.PNG "SemEval Plutchik results")
-
-On the full SemEval emotion classification dataset we find that finetuning our model on the data achieves competitive state of the art performance with no additional domain-specific feature engineering.
-
-![semeval leaderboard](./figures/semeval_leaderboard.png "SemEval leaderboard")
-
-## ReadMe Contents
- * [Setup](#setup)
-   * [Install](#install)
-   * [Pretrained Models](#pretrained-models)
-   * [Data Downloads](#data-downloads)
- * [Usage](#usage)
-    * [Classifying Text](#classifying-text)
-      * [Classification Documentation](./script_docs/arguments.md#running-a-classifier-arguments)
-    * [Training Language Models (+ Distributed/FP16 Training)](#training-language-models-distributed-fp16-training)
-      * [Modeling Documentation](./script_docs/arguments.md#unsupervised-lm-arguments)
-      * [Training HyperParameter Documentation](./analysis/reproduction.md#training-set-up)
-      * [FP16 Training Information](./analysis/reproduction.md#fp16-training)
-    * [Sentiment Transfer](#sentiment-transfer)
-      * [Transfer Documentation](./script_docs/arguments.md#sentiment-transfer-arguments)
-    * [Classifier Finetuning](#classifier-finetuning)
-      * [Finetuning Documentation](./script_docs/arguments.md#finetuning-a-classifier-arguments)
-    * [All Argument Documentation](./script_docs/arguments.md)
- * [Analysis](#analysis)
-    * [Why Unsupervised Language Modeling?](./analysis/unsupervised.md)
-      * [Difficulties of Supervised Natural Language](./analysis/unsupervised.md#difficulties-of-supervised-natural-language)
-      * [Data Robustness](./analysis/unsupervised.md#data-robustness)
-      * [Model/Optimization Robustness](./analysis/unsupervised.md#modeloptimization-robustness)
-  * [Reproducing Results](./analysis/reproduction.md)
-     * [Training](./analysis/reproduction.md#training)
-        * [Transformer Training Setup](./analysis/reproduction.md#transformer-training-set-up)
-        * [mLSTM Training Setup](./analysis/reproduction.md#mlstm-training-set-up)
-     * [FP16 Training](./analysis/reproduction.md#fp16-training)
-     * [Large Model Training](./analysis/reproduction.md#going-bigger-with-large-models)
-     * [Sentiment Transfer](./analysis/reproduction.md#transfer)
-     * [Finetuning Classifiers](./analysis/reproduction.md#finetuning-classifiers)
-     * [ELMo Comparison](./analysis/reproduction.md#elmo-comparison)
-  * [Data Parallel Scalability](./analysis/scale.md)
-     * [PyTorch + GIL](./analysis/scale.md#pytorch-gil)
-  * [Open Questions](./analysis/questions.md)
- * [Acknowledgement](#acknowledgement)
- * [Thanks](#thanks)
-
 ## Setup
-### Install
-Install the sentiment_discovery package with `python3 setup.py install` in order to run the modules/scripts within this repo.
+
+* Use a conda environment with python 3.7.9 (should work on other version but this is what I tested on)
+* install torch, torchvision,  torchaudio, tqdm, numpy, pandas via
+```
+pip install torch torchvision torchaudio tqdm numpy pandas
+```
+
+* execute
+```
+python setup.py install
+```
+* download the best performing transformer: [Finetuned Plutchik Transformer](https://drive.google.com/file/d/1rC6LWGNkHaZkuojCEWDqSKcDGwFMBTYZ/view?usp=sharing) [673MN]
+* copy the file (transformer_semeval.clf) into this folder
+```
+scp user@remote_url:path_to_copy_to path_to_local_file
+```
+
+* the needed vocabulary is already in this repository
+
+## Run the evaluation
+```
+python run_classifier.py --model transformer --load transformer_semeval.clf  --tokenizer-type SentencePieceTokenizer --tokenizer-path ama_32k_tokenizer.model --vocab-size 32000 --text-key <Name-of-text-col> --data <Path-to-data>
+```
+Use the `--gpu_num` flag to specify which gpu to use. There is a console print to verify if it worked.
 
 ### Python Requirements
 At this time we only support python3.
